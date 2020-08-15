@@ -1,0 +1,9 @@
+.ReviewForm select, .ReviewForm label {
+  font-size: 1.1em;
+}
+
+.ReviewForm label {
+  display: inline-block;
+  margin: 10px 10px 20px;
+  margin-left: 0;
+}
