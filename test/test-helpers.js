@@ -230,6 +230,21 @@ function cleanTables(db) {
   )
 }
 
+function seedUsers(db,users){
+	const preppedUsers = users.map(user=>({
+		...user,
+		password:bcrypt.hashSync(user.password,1)
+	}));
+	return db.into('thingful_users').insert(preppedUsers)
+	  .then(()=>
+	    // update the auto sequence to stay in sync
+	    db.raw(
+	    	`SELECT setval('thingful_users_id_seq', ?)`,
+	    	[users[users.length - 1].id],
+	    )
+	);
+}
+
 function seedThingsTables(db, users, things, reviews=[]) {
   return db
     .into('thingful_users')
@@ -261,16 +276,16 @@ function makeAuthHeader(user){
 }
 
 module.exports = {
-  makeUsersArray,
-  makeThingsArray,
-  makeExpectedThing,
-  makeExpectedThingReviews,
-  makeMaliciousThing,
-  makeReviewsArray,
-
-  makeThingsFixtures,
-  cleanTables,
-  seedThingsTables,
-  seedMaliciousThing,
-  makeAuthHeader
+	makeUsersArray,
+	makeThingsArray,
+	makeExpectedThing,
+	makeExpectedThingReviews,
+	makeMaliciousThing,
+	makeReviewsArray,
+	makeThingsFixtures,
+	cleanTables,
+	seedUsers,
+	seedThingsTables,
+	seedMaliciousThing,
+	makeAuthHeader
 }

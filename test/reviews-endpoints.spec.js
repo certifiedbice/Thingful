@@ -84,9 +84,7 @@ describe('Reviews Endpoints',function(){
 					.post('/api/reviews')
 					.set('Authorization',helpers.makeAuthHeader(testUser))
 		  			.send(newReview)
-		  			.expect(400,{
-						error:`Missing '${field}' in request body`
-					});
+		  			.expect(400,{error:`Missing '${field}' in request body`});
 		  	});
 		});
 	});

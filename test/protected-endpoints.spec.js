@@ -7,10 +7,7 @@ describe('Things Endpoints',function(){
 	const {testUsers,testThings}=helpers.makeThingsFixtures();
 
 	before('make knex instance',()=>{
-		db=knex({
-			client:'pg',
-			connection:process.env.TEST_DB_URL,
-		});
+		db=knex({client:'pg',connection:process.env.TEST_DB_URL});
 		app.set('db',db);
 	});
 
@@ -32,7 +29,7 @@ describe('Things Endpoints',function(){
 				name:'GET /api/things/:thing_id/reviews',
 				path:'/api/things/1/reviews'
 			},
-		]
+		];
 		protectedEndpoints.forEach(endpoint=>{
 			describe(endpoint.name,()=>{
 				it(`responds with 401 'Missing basic token' when no basic token`,()=>{
@@ -70,10 +67,10 @@ describe('Things Endpoints',function(){
 					.expect(401,{error:'Missing basic token'});
 			});
 			it('should return 401 \'Unauthorized request\' when no credentials exist',()=>{
-				const userNoCreds={user_name:'', password:''};
+				const userNoCreds={user_name:'',password:''};
 				return supertest(app)
 					.post('/api/reviews')
-					.set('Authorization', helpers.makeAuthHeader(userNoCreds))
+					.set('Authorization',helpers.makeAuthHeader(userNoCreds))
 					.expect(401,{error:'Unauthorized request'});
 			});
 			it('should return 401 \'Unauthorized request\' when invalid user',()=>{
