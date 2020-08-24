@@ -1,4 +1,7 @@
-function makeUsersArray() {
+const bcrypt=require('bcryptjs');
+const jwt=require('jsonwebtoken');
+
+function makeUsersArray(){
   return [
     {
       id: 1,
@@ -35,7 +38,7 @@ function makeUsersArray() {
   ]
 }
 
-function makeThingsArray(users) {
+function makeThingsArray(users){
   return [
     {
       id: 1,
@@ -72,7 +75,7 @@ function makeThingsArray(users) {
   ]
 }
 
-function makeReviewsArray(users, things) {
+function makeReviewsArray(users,things){
   return [
     {
       id: 1,
@@ -133,7 +136,7 @@ function makeReviewsArray(users, things) {
   ];
 }
 
-function makeExpectedThing(users, thing, reviews=[]) {
+function makeExpectedThing(users,thing,reviews=[]){
   const user = users
     .find(user => user.id === thing.user_id)
 
@@ -161,7 +164,7 @@ function makeExpectedThing(users, thing, reviews=[]) {
   }
 }
 
-function calculateAverageReviewRating(reviews) {
+function calculateAverageReviewRating(reviews){
   if(!reviews.length) return 0
 
   const sum = reviews
@@ -171,7 +174,7 @@ function calculateAverageReviewRating(reviews) {
   return Math.round(sum / reviews.length)
 }
 
-function makeExpectedThingReviews(users, thingId, reviews) {
+function makeExpectedThingReviews(users,thingId,reviews){
   const expectedReviews = reviews
     .filter(review => review.thing_id === thingId)
 
@@ -193,7 +196,7 @@ function makeExpectedThingReviews(users, thingId, reviews) {
   })
 }
 
-function makeMaliciousThing(user) {
+function makeMaliciousThing(user){
   const maliciousThing = {
     id: 911,
     image: 'http://placehold.it/500x500',
@@ -213,14 +216,14 @@ function makeMaliciousThing(user) {
   }
 }
 
-function makeThingsFixtures() {
-  const testUsers = makeUsersArray()
-  const testThings = makeThingsArray(testUsers)
-  const testReviews = makeReviewsArray(testUsers, testThings)
-  return { testUsers, testThings, testReviews }
+function makeThingsFixtures(){
+  const testUsers=makeUsersArray();
+  const testThings=makeThingsArray(testUsers);
+  const testReviews=makeReviewsArray(testUsers,testThings);
+  return {testUsers,testThings,testReviews};
 }
 
-function cleanTables(db) {
+function cleanTables(db){
   return db.raw(
     `TRUNCATE
       thingful_things,
@@ -245,7 +248,7 @@ function seedUsers(db,users){
 	);
 }
 
-function seedThingsTables(db, users, things, reviews=[]) {
+function seedThingsTables(db,users,things,reviews=[]){
   return db
     .into('thingful_users')
     .insert(users)
@@ -259,7 +262,7 @@ function seedThingsTables(db, users, things, reviews=[]) {
     )
 }
 
-function seedMaliciousThing(db, user, thing) {
+function seedMaliciousThing(db,user,thing){
   return db
     .into('thingful_users')
     .insert([user])
@@ -270,12 +273,14 @@ function seedMaliciousThing(db, user, thing) {
     )
 }
 
-function makeAuthHeader(user){
-  const token=Buffer.from(`${user.user_name}:${user.password}`).toString('base64');
-  return `Basic ${token}`;
+function makeAuthHeader(user,secret=process.env.JWT_SECRET){
+	// const token = Buffer.from(`${user.user_name}:${user.password}`).toString('base64')
+	const token=jwt.sign({user_id:user.id},secret,{subject:user.user_name,algorithm:'HS256'});
+	// return `Basic ${token}`
+	return `Bearer ${token}`;
 }
 
-module.exports = {
+module.exports={
 	makeUsersArray,
 	makeThingsArray,
 	makeExpectedThing,
